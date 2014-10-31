@@ -1,5 +1,27 @@
-extends layout
+doctype html 
+html(lang='en', xmlns='http://www.w3.org/1999/html')
 
-block content
-  h1= title
-  p Welcome to #{title}
+include ./head.jade
+link(href='css/base.css', type='text/css', rel='stylesheet', media='screen and (min-width: 100px)')
+script(type='text/javascript').
+  var info = !{info}
+
+body
+  div.login-card  
+    if typeof error != 'undefined'
+      div.error.red
+        p #{error}
+
+    div.label
+      h1.white Login
+
+    form(name="login", action="/login", method="post")
+      input(type="text", name="username", placeholder="username")
+      input(type="password", name="password", placeholder="password")
+      input(type="submit", value="Login", class="login login-submit")
+      
+      div.login-hejpgelp
+        div.left
+          a(href="/register") Register
+        div.right
+          a(href="/reset") Forgot Password

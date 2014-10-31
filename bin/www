@@ -1,9 +1,37 @@
 #!/usr/bin/env node
 var debug = require('debug')('clinalytics');
 var app = require('../app');
+var https = require('https');
+var fs = require('fs');
+var Logger = require('winston');
 
 app.set('port', process.env.PORT || 3000);
 
-var server = app.listen(app.get('port'), function() {
-  debug('Express server listening on port ' + server.address().port);
+
+
+// development only
+if ('development' !== process.env.environment) { // Remove console logging from other environments
+    Logger.add(Logger.transports.File, {
+        filename: process.env.logfile
+    });
+    Logger.remove(Logger.transports.Console);
+} else {
+    var privateKey = fs.readFileSync(__dirname + '/keys/stock-key.pem');
+    var certificate = fs.readFileSync(__dirname + '/keys/stock-cert.pem');
+    var options = {
+        key: privateKey,
+        cert: certificate
+    };
+    // Initialize log and add a transport file
+    Logger.add(Logger.transports.File, {
+        filename: "bin/logs/clinalytics.log"
+    });
+}
+
+https.createServer(options, app).listen(app.get('port'), function() {
+    Logger.info('Express server listening on port ' + app.get('port'));
 });
+
+/*var server = app.listen(app.get('port'), function() {
+  debug('Express server listening on port ' + server.address().port);
+});*/
